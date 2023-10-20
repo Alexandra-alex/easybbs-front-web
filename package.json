@@ -12,6 +12,7 @@
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^5.1.12",
     "axios": "^1.2.3",
+    "electron": "^27.0.1",
     "element-plus": "^2.2.28",
     "highlight.js": "^11.7.0",
     "js-md5": "^0.7.3",
