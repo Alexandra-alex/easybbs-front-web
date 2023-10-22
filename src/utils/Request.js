@@ -8,7 +8,7 @@ const contentTypeForm = "application/x-www-form-urlencoded;charset=UTF-8";
 const contentTypeJson = "application/json"
 
 const instance = axios.create({
-    baseURL: "/api",
+    baseURL: '/api',
     timeout: 30 * 1000,
 })
 //请求前过滤器

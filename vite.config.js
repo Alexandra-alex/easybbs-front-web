@@ -6,17 +6,20 @@ import vue from '@vitejs/plugin-vue'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
+  base: './',
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
   server: {
-    hmr: true,
+    open: true,
+    host: 'localhost',
     port: 3004,
+    hmr: true,
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:7078",
+        target: "http://localhost:7078",
         changeOrigin: true,
         pathRewrite: {
           "^api": "/api"
@@ -26,6 +29,8 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 3000,
+    outDir: "dist",
+    assetsDir: "assets",
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -36,11 +41,8 @@ export default defineConfig({
       }
     },
     chunkFileNames: (chunkInfo) => {
-      const facadeModuleId = chunkInfo.facadeModuleId
-        ? chunkInfo.facadeModuleId.split('/')
-        : [];
-      const fileName =
-        facadeModuleId[facadeModuleId.length - 2] || '[name]';
+      const facadeModuleId = chunkInfo.facadeModuleId ? chunkInfo.facadeModuleId.split('/') : [];
+      const fileName = facadeModuleId[facadeModuleId.length - 2] || '[name]';
       return `js/${fileName}/[name].[hash].js`;
     }
   }
