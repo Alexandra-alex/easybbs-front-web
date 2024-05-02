@@ -85,6 +85,7 @@ const orderChange = (type) => {
 const loading = ref(null);
 const commentListInfo = ref({});
 
+//获取评论列表
 const loadComment = async () => {
   let params = {
     pageNo: commentListInfo.value.pageNo,

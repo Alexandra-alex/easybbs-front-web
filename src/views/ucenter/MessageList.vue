@@ -196,6 +196,7 @@ const tabChange = (type) => {
 
 const loading = ref(false);
 const messageListInfo = ref({});
+//加载消息列表
 const loadMessage = async () => {
   loading.value = true;
   let params = {
@@ -215,6 +216,7 @@ const loadMessage = async () => {
   store.commit("readMessage", activeTabName.value);
 };
 
+//监听消息类型
 watch(
   () => route.params.type,
   (newVal, oldVal) => {
@@ -236,7 +238,7 @@ watch(
   },
   { immediate: true, deep: true }
 );
-//消息数量
+//监听消息数量
 const messageCountInfo = ref({});
 watch(
   () => store.state.messageCountInfo,

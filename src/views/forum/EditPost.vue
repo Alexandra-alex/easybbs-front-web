@@ -134,8 +134,10 @@ const api = {
 
 const articleId = ref(null);
 const getArticleDetail = () => {
+  //实时获取文章id信息
   nextTick(async () => {
     formDataRef.value.resetFields();
+    //如有文章id则为编辑文章
     if (articleId.value) {
       //修改
       let result = await proxy.Request({
@@ -188,9 +190,11 @@ const setHtmlContent = (htmlContent) => {
   formData.value.content = htmlContent;
 };
 
+//深度监视路由
 watch(
   () => route,
   (newVal, oldVal) => {
+    //如newValue中包含字符串则是编辑页面
     if (
       newVal.path.indexOf("/editPost") != -1 ||
       newVal.path.indexOf("/newPost") != -1
@@ -216,6 +220,7 @@ const rules = {
 
 //提交信息
 const postHandler = () => {
+  //验证数据格式
   formDataRef.value.validate(async (valid) => {
     if (!valid) {
       return;
@@ -238,6 +243,7 @@ const postHandler = () => {
       proxy.message.warning("正文不能为空");
       return;
     }
+    //判断有无附件
     if (params.attachment != null) {
       params.attachmentType == 1;
     } else {
@@ -248,11 +254,11 @@ const postHandler = () => {
     if (!(params.cover instanceof File)) {
       delete params.cover;
     }
-    //附件不是文件乐行，值设置为空
+    //如果附件不是文件，则值设置为空
     if (!(params.attachment instanceof File)) {
       delete params.attachment;
     }
-
+    //如文章id存在则更新文章否则上传文章
     let result = await proxy.Request({
       url: params.articleId ? api.updateArticle : api.postArticle,
       params: params,
@@ -261,6 +267,7 @@ const postHandler = () => {
       return;
     }
     proxy.Message.success("保存成功");
+    //进入文章详情页面
     router.push(`/post/${result.data}`);
   });
 };

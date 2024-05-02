@@ -310,12 +310,15 @@ const dialogConfig4SendMailCode = reactive({
 });
 //获取邮箱验证码
 const getEmailCode = () => {
+  //验证邮箱格式
   formDataRef.value.validateField("email", (valid) => {
     if (!valid) {
       return;
     }
+    //打开发送邮箱验证码弹窗
     dialogConfig4SendMailCode.show = true;
 
+    //通过nextTick确保验证码一直为最新
     nextTick(() => {
       changeCheckCode(1);
       formData4SendMailCodeRef.value.resetFields();
@@ -325,14 +328,17 @@ const getEmailCode = () => {
     });
   });
 };
-//发送邮件
+//发送邮件验证码
 const sendEmailCode = () => {
   formData4SendMailCodeRef.value.validate(async (valid) => {
     if (!valid) {
       return;
     }
+    //复制验证码
     const params = Object.assign({}, formData4SendMailCode.value);
+    //判断操作类型
     params.type = opType.value == 0 ? 0 : 1;
+    //发送请求以发送验证码
     let result = await proxy.Request({
       url: api.sendMailCode,
       params: params,
@@ -415,6 +421,7 @@ const resetForm = () => {
 
 // 登录、注册、重置密码  提交表单
 const doSubmit = () => {
+  //验证数据格式
   formDataRef.value.validate(async (valid) => {
     if (!valid) {
       return;
@@ -423,19 +430,23 @@ const doSubmit = () => {
     Object.assign(params, formData.value);
     //注册
     if (opType.value == 0 || opType.value == 2) {
+      //保存密码并清空注册页面密码
       params.password = params.registerPassword;
       delete params.registerPassword;
       delete params.reRegisterPassword;
     }
     //登录
     if (opType.value == 1) {
+      //通过Token获取用户信息
       let cookieLoginInfo = proxy.VueCookies.get("loginInfo");
       let cookiePassword =
         cookieLoginInfo == null ? null : cookieLoginInfo.password;
       if (params.password !== cookiePassword) {
+        //密码加密
         params.password = md5(params.password);
       }
     }
+    //操作类型
     let url = null;
     if (opType.value == 0) {
       url = api.register;
@@ -461,17 +472,20 @@ const doSubmit = () => {
     } else if (opType.value == 1) {
       //登录
       if (params.rememberMe) {
+        //保存邮箱和密码
         const loginInfo = {
           email: params.email,
           password: params.password,
           rememberMe: params.rememberMe,
         };
+        //7天内自动登录
         proxy.VueCookies.set("loginInfo", loginInfo, "7d");
       } else {
         proxy.VueCookies.remove("loginInfo");
       }
       dialogConfig.show = false;
       proxy.Message.success("登录成功");
+      //更新登录用户信息
       store.commit("updateLoginUserInfo", result.data);
     } else if (opType.value == 2) {
       //重置密码

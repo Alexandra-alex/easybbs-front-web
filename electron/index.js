@@ -1,20 +1,28 @@
 // 控制应用生命周期和创建原生浏览器窗口的模组
 const { app, BrowserWindow } = require('electron')
 const path = require('path')
-const httpServer = require('http-server');
+const httpServer = require('http-server')
 
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true; // 关闭控制台的警告
 
-function createWindow () {
-  const server = httpServer.createServer({
-    root: '../dist',
-    cors: true,
-    proxy: 'http://localhost:7078'
-  });
-  server.listen(3004, () => {
-    console.log('Server running on port 3004');
-  });
+const NODE_ENV = process.env.NODE_ENV
 
+function webServer () {
+  //开启http服务
+  if(NODE_ENV !== 'development'){
+    const server = httpServer.createServer({
+      root: path.resolve(__dirname, '../dist'),
+      cors: true,
+      proxy: 'http://47.120.5.226:7078'
+      // proxy: 'http://localhost:8000'
+    });
+    server.listen(3004, () => {
+      console.log('Server running on port 3004');
+    });
+  }
+}
+
+function createWindow () {
   // 创建浏览器窗口
   const mainWindow = new BrowserWindow({
     width: 1600,
@@ -40,6 +48,7 @@ function createWindow () {
 // 这段程序将会在 Electron 结束初始化和创建浏览器窗口的时候调用
 // 部分 API 在 ready 事件触发后才能使用。
 app.whenReady().then(() => {
+  webServer()
   createWindow()
  
   app.on('activate', () => {

@@ -207,6 +207,7 @@ const attachment = ref({});
 //是否已点赞
 const haveLike = ref(false);
 
+//获取文章详情
 const getArticleDetail = async (articleId) => {
   let result = await proxy.Request({
     url: api.getArticleDetail,
@@ -220,6 +221,7 @@ const getArticleDetail = async (articleId) => {
   articleInfo.value = result.data.forumArticle;
   attachment.value = result.data.attachment;
   haveLike.value = result.data.haveLike;
+  //更新板块信息
   store.commit("setActivePboardId", result.data.forumArticle.pBoardId);
   store.commit("setActiveBoardId", result.data.forumArticle.boardId);
 
@@ -261,10 +263,13 @@ const goToPostion = (domId) => {
 
 //点赞
 const doLikeHandler = async () => {
+  //未获取到登录用户信息
   if (!store.getters.getLoginUserInfo) {
+    //弹出登录界面
     store.commit("showLogin", true);
     return;
   }
+  //获取点赞数
   let result = await proxy.Request({
     url: api.doLike,
     params: {
@@ -284,11 +289,12 @@ const doLikeHandler = async () => {
 
 //下载附件
 const downloadAttachment = async (fileId) => {
+  //用户未登录
   if (!currentUserInfo.value) {
     store.commit("showLogin", true);
     return;
   }
-  // 0积分
+  // 附件所需为0积分或文章作者本人
   if (
     attachment.value.integral == 0 ||
     currentUserInfo.value.userId == articleInfo.value.userId
@@ -313,7 +319,7 @@ const downloadAttachment = async (fileId) => {
     return;
   }
 
-  //判断用户积分是否够
+  //判断用户积分是否足够
   if (result.data.userIntegral < attachment.value.integral) {
     proxy.Message.warning("你的积分不够，无法下载");
     return;
@@ -327,6 +333,7 @@ const downloadAttachment = async (fileId) => {
   );
 };
 
+//下载
 const downloadDo = (fileId) => {
   document.location.href = api.attachmentDownload + "?fileId=" + fileId;
   attachment.value.downloadCount = attachment.value.downloadCount + 1;
@@ -449,8 +456,6 @@ watch(
   { immediate: true, deep: true }
 );
 </script>
-
-
 
 <style lang="scss">
 .article-detail-body {

@@ -95,12 +95,14 @@ const rules = {
 };
 
 const emit = defineEmits(["postCommentFinish"]);
+//评论发表
 const postCommentDo = () => {
   formDataRef.value.validate(async (valid) => {
     if (!valid) {
       return;
     }
     let params = Object.assign({}, formData.value);
+    //通过props获取文章和评论信息
     params.articleId = props.articleId;
     params.pCommentId = props.pCommentId;
     params.replyUserId = props.replyUserId;
@@ -113,16 +115,19 @@ const postCommentDo = () => {
     }
     proxy.Message.success("评论发表成功");
     formDataRef.value.resetFields();
+    //移除图片
     removeCommentImg();
+    //刷新评论
     emit("postCommentFinish", result.data);
   });
 };
 
-//选择图片
+//上传图片
 const commentImg = ref(null);
 const selectImg = (file) => {
   file = file.file;
   let img = new FileReader();
+  //读取图片信息并上传
   img.readAsDataURL(file);
   img.onload = ({ target }) => {
     let imgData = target.result;
@@ -131,6 +136,7 @@ const selectImg = (file) => {
   };
 };
 
+//移除图片
 const removeCommentImg = () => {
   commentImg.value = null;
   formData.value.image = null;
